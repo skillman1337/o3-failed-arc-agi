@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ARC testing interface</title>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/testing_interface.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="css/common.css">
+        <link rel="stylesheet" type="text/css" href="css/testing_interface.css">
+
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+
+    </head>
+    <body>
+        <div id="workspace">
+
+            <div id="demonstration_examples_view">
+                <div class="text">Task demonstration</div>
+                <div id="task_preview"></div>
+            </div>
+
+            <div id="evaluation_view">
+
+                <div id="evaluation-input-view">
+                    <div class="text">Test input grid (<span id="input_grid_size"></span>) </div>
+
+                    <div id="evaluation_input"></div>
+
+                    <div class="text" style="margin-top: 25px;clear: both;">Solution grid (<span id="solution_grid_size"></span>) </div>
+                    <div id="solution_output"></div>
+                </div>
+
+                <div id="evaluation_output_editor">
+
+                    <div id="load_task_control_btns">
+                        <button onclick="previousFailedTask()" id="previous_task_btn">Previous</button>
+                        <button onclick="nextFailedTask()" id="next_task_btn">Next</button>
+                        <p>
+                        <label id='task_name' for="random_task_btn"> Failed task name: </label>
+                        <p>
+                    </div>
+
+                    <div id="edition_view">
+                        <div id="output_grid">
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
