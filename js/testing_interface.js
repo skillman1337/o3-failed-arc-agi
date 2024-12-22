@@ -100,37 +100,97 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
 
 function loadJSONTask(train, test) {
     resetTask();
-    $('#modal_bg').hide();
-    $('#error_display').hide();
-    $('#info_display').hide();
+    hideElements(['#modal_bg', '#error_display', '#info_display']);
 
-    for (var i = 0; i < train.length; i++) {
-        pair = train[i];
-        values = pair['input'];
-        input_grid = convertSerializedGridToGridObject(values)
-        values = pair['output'];
-        output_grid = convertSerializedGridToGridObject(values)
-        fillPairPreview(i, input_grid, output_grid);
-    }
-    for (var i=0; i < test.length; i++) {
-        pair = test[i];
-        TEST_PAIRS.push(pair);
-    }
-    values = TEST_PAIRS[0]['input'];
-    CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
-    fillTestInput(CURRENT_INPUT_GRID);
-    CURRENT_TEST_PAIR_INDEX = 0;
-    $('#current_test_input_id_display').html('1');
-    $('#total_test_input_count_display').html(test.length);
+    populateTrainingPairs(train);
+    populateTestPairs(test);
 
-    // Add this part to display the last test output
     if (test.length > 0) {
-        let lastTestOutput = convertSerializedGridToGridObject(test[test.length - 1]['output']);
-        let jqLastTestOutputGrid = $('#solution_output');
-        fillJqGridWithData(jqLastTestOutputGrid, lastTestOutput);
-        fitCellsToContainer(jqLastTestOutputGrid, lastTestOutput.height, lastTestOutput.width, 400, 400);
-        $('#solution_grid_size').text(`${lastTestOutput.height}x${lastTestOutput.width}`);
+        displayTestOutput(0, '#solution_output1', '#input_grid_size1', CURRENT_INPUT_GRID);
     }
+
+    if (test.length > 1) {
+        displayTestOutput(1, '#solution_output2', '#input_grid_size2', getNextInputGrid(1));
+        showElements([
+            '#eval_text_2',
+            '#sol_text_2',
+            '#evaluation_input2',
+            '#solution_output2'
+        ]);
+    }
+
+    if (test.length === 1) {
+        hideElements([
+            '#evaluation_input2',
+            '#solution_output2',
+            '#eval_text_2',
+            '#sol_text_2'
+        ]);
+    }
+
+    console.log(test);
+}
+
+function hideElements(selectors) {
+    selectors.forEach(selector => $(selector).hide());
+}
+
+function showElements(selectors) {
+    selectors.forEach(selector => $(selector).show());
+}
+
+function populateTrainingPairs(train) {
+    train.forEach((pair, index) => {
+        const inputGrid = convertSerializedGridToGridObject(pair.input);
+        const outputGrid = convertSerializedGridToGridObject(pair.output);
+        fillPairPreview(index, inputGrid, outputGrid);
+    });
+}
+
+function populateTestPairs(test) {
+    TEST_PAIRS.length = 0; // Clear existing test pairs
+    test.forEach(pair => TEST_PAIRS.push(pair));
+
+    if (TEST_PAIRS.length > 0) {
+        const firstInput = convertSerializedGridToGridObject(TEST_PAIRS[0].input);
+        CURRENT_INPUT_GRID = firstInput;
+        fillTestInput(CURRENT_INPUT_GRID);
+        CURRENT_TEST_PAIR_INDEX = 0;
+        updateTestCounters(1, test.length);
+    }
+}
+
+function updateTestCounters(current, total) {
+    $('#current_test_input_id_display').text(current);
+    $('#total_test_input_count_display').text(total);
+}
+
+function displayTestOutput(index, outputSelector, sizeSelector, inputGrid) {
+    const testPair = TEST_PAIRS[index];
+    if (!testPair) return;
+
+    const outputGrid = convertSerializedGridToGridObject(testPair.output);
+    fillJqGridWithData($(outputSelector), outputGrid);
+    fitCellsToContainer($(outputSelector), outputGrid.height, outputGrid.width, 400, 400);
+    $(sizeSelector).text(`${outputGrid.height}x${outputGrid.width}`);
+
+    if (index === 0) {
+        $('#solution_grid_size1').text(`${inputGrid.height}x${inputGrid.width}`);
+    } else if (index === 1) {
+        $('#solution_grid_size2').text(`${inputGrid.height}x${inputGrid.width}`);
+    }
+}
+
+function getNextInputGrid(index) {
+    if (TEST_PAIRS[index]) {
+        const nextInput = convertSerializedGridToGridObject(TEST_PAIRS[index].input);
+        CURRENT_INPUT_GRID = nextInput;
+        fillJqGridWithData($('#evaluation_input2'), CURRENT_INPUT_GRID);
+        fitCellsToContainer($('#evaluation_input2'), CURRENT_INPUT_GRID.height, CURRENT_INPUT_GRID.width, 400, 400);
+        $('#input_grid_size2').text(`${CURRENT_INPUT_GRID.height}x${CURRENT_INPUT_GRID.width}`);
+        return CURRENT_INPUT_GRID;
+    }
+    return null;
 }
 
 function display_task_name(task_name, current, total) {
@@ -283,7 +343,7 @@ function submitSolution() {
 }
 
 function fillTestInput(inputGrid) {
-    jqInputGrid = $('#evaluation_input');
+    jqInputGrid = $('#evaluation_input1');
     fillJqGridWithData(jqInputGrid, inputGrid);
     fitCellsToContainer(jqInputGrid, inputGrid.height, inputGrid.width, 400, 400);
     $('#input_grid_size').text(`${inputGrid.height}x${inputGrid.width}`);
