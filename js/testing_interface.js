@@ -172,12 +172,15 @@ function displayTestOutput(index, outputSelector, sizeSelector, inputGrid) {
     const outputGrid = convertSerializedGridToGridObject(testPair.output);
     fillJqGridWithData($(outputSelector), outputGrid);
     fitCellsToContainer($(outputSelector), outputGrid.height, outputGrid.width, 400, 400);
-    $(sizeSelector).text(`${outputGrid.height}x${outputGrid.width}`);
 
+    // Set the size of the Test input grid correctly
+    $(sizeSelector).text(`${inputGrid.height}x${inputGrid.width}`);
+
+    // Set the size of the Solution grid correctly
     if (index === 0) {
-        $('#solution_grid_size1').text(`${inputGrid.height}x${inputGrid.width}`);
+        $('#solution_grid_size1').text(`${outputGrid.height}x${outputGrid.width}`);
     } else if (index === 1) {
-        $('#solution_grid_size2').text(`${inputGrid.height}x${inputGrid.width}`);
+        $('#solution_grid_size2').text(`${outputGrid.height}x${outputGrid.width}`);
     }
 }
 
